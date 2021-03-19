@@ -17,10 +17,10 @@
 ### data flow
 > json->redis->kafka->flink->clickhouse->fontend show
 
-#### json2redis
+#### json2redis[done]
 - 对数据进行预处理
 - 暂定为去重+排序
-#### redis2kafka
+#### redis2kafka[done]
 - 将处理后的数据导入 kafka 中
 
 #### kafka2flink
