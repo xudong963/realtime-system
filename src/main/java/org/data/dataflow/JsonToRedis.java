@@ -12,6 +12,7 @@ import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommand;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommandDescription;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
 
+//pass file data to redis
 public class JsonToRedis {
 
   public static void main(String[] args) throws Exception {

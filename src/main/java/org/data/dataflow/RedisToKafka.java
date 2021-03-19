@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
@@ -19,7 +18,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Jedis;
 
-
+// kafka read redis data
 public class RedisToKafka {
 
   public static void main(String[] args) throws Exception {
