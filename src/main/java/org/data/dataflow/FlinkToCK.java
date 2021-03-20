@@ -4,16 +4,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 
 class FlinkToCK extends RichSinkFunction<String> {
 
-  FlinkToCK(String host, String port, String user, String pwd) throws SQLException {
+  FlinkToCK(String host, String port, String user, String pwd) {
     super();
-    this.connection_ = DriverManager.getConnection("jdbc:clickhouse://" + host + ":" + port, user, pwd);
-    this.statement_ = connection_.createStatement();
-    statement_.execute("CREATE DATABASE IF NOT EXISTS test");
+    host_ = host;
+    port_ = port;
+    user_ = user;
+    pwd_ = pwd;
   }
 
   @Override
@@ -25,6 +27,17 @@ class FlinkToCK extends RichSinkFunction<String> {
     connection_.close();
   }
 
-  private final Connection connection_;
-  private final Statement statement_;
+  @Override
+  public void open(Configuration param) throws SQLException {
+    this.connection_ = DriverManager.getConnection("jdbc:clickhouse://" + host_ + ":" + port_, user_, pwd_);
+    this.statement_ = connection_.createStatement();
+    statement_.execute("CREATE DATABASE IF NOT EXISTS test");
+  }
+
+  private Connection connection_;
+  private Statement statement_;
+  private final String host_;
+  private final String port_;
+  private final String user_;
+  private final String pwd_;
 }
