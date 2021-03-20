@@ -23,15 +23,20 @@
 #### redis2kafka[done]
 - 将处理后的数据导入 kafka 中
 
-#### kafka2flink
+#### kafka2flink[done]
 - flink 从 kafka 中 消费数据，模拟实时数据流
 
-#### flink2ck
+#### flink2ck[done]
 - 数据最终流向 clickhouse
 
 #### ck2show
 - 通过datav 对数据进行实时展示
 
 #### reference
+深入理解kafka
+vue
+javascript
+flink 文档
+clickhouse 文档
 
 
