@@ -2,6 +2,7 @@ package org.data.dataflow;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import org.apache.flink.configuration.Configuration;
@@ -20,7 +21,11 @@ class FlinkToCK extends RichSinkFunction<String> {
 
   @Override
   public void invoke(String value, SinkFunction.Context context) throws SQLException {
-    statement_.execute("INSERT INTO test VALUES ('${value}')");
+    String sql = "INSERT INTO test (column_1) VALUES (?)";
+    PreparedStatement statement = connection_.prepareStatement(sql);
+    statement.setString(1, value);
+    statement.addBatch();
+    statement.executeBatch();
   }
 
   public void close() throws SQLException {
@@ -30,12 +35,9 @@ class FlinkToCK extends RichSinkFunction<String> {
   @Override
   public void open(Configuration param) throws SQLException {
     this.connection_ = DriverManager.getConnection("jdbc:clickhouse://" + host_ + ":" + port_, user_, pwd_);
-    this.statement_ = connection_.createStatement();
-    statement_.execute("CREATE DATABASE IF NOT EXISTS test");
   }
 
   private Connection connection_;
-  private Statement statement_;
   private final String host_;
   private final String port_;
   private final String user_;

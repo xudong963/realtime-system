@@ -4,6 +4,7 @@ package org.data.dataflow;
 import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -24,7 +25,7 @@ public class KafkaToFlink {
     SingleOutputStreamOperator<String> dataStreamSource = streamExecutionEnvironment
         .addSource(new FlinkKafkaConsumer<>(
             "my-topic",
-            new CustomKafkaDeserializationSchema(),
+            new SimpleStringSchema(),
             properties).setStartFromEarliest()
         ).map((MapFunction<String, String>) s -> {
           Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
