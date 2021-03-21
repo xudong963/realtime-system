@@ -30,12 +30,10 @@
 - 数据最终流向 clickhouse
 
 #### ck2show
-- 通过datav 对数据进行实时展示
+- 可视化备选： Datav, EasyV, FineReport
 
 #### reference
 深入理解kafka
-vue
-javascript
 flink 文档
 clickhouse 文档
 
