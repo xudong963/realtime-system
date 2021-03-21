@@ -28,7 +28,7 @@ public class KafkaToFlink {
             new SimpleStringSchema(),
             properties).setStartFromEarliest()
         ).map((MapFunction<String, String>) s -> {
-          Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
+          Thread.sleep(ThreadLocalRandom.current().nextInt(0, 10));
           return s;
         });
     dataStreamSource.addSink(new FlinkToCK("10.227.89.202", 8123 + "", "default", ""));

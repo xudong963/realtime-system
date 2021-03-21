@@ -29,7 +29,7 @@ public class RedisToKafka {
     SingleOutputStreamOperator<String> dataStreamSource = streamExecutionEnvironment.addSource(new FilterRedisSource()).map(
         (MapFunction<String, String>) s -> {
           //Simulate real-time state
-          Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
+          Thread.sleep(ThreadLocalRandom.current().nextInt(0, 10));
           return s;
         });
     FlinkKafkaProducer<String> producer = new FlinkKafkaProducer<String>(
