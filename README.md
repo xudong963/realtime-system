@@ -57,3 +57,12 @@ clickhouse 文档
 10. 查看 retention 时间是多少：  grep -i 'log.retention.[hms].*\=' config/server.properties   
 11. 查看 kafka topic 信息： kafka-topics.sh --zookeeper localhost:2181 --describe --topics-with-overrides
 12. 启动redis2kafka
+
+#### 腾讯云
+1. ssh root@82.157.179.4
+2. 密码： zsy123456..
+
+#### clickhouse
+1. config: sudo vi /etc/clickhouse-server/config.xml
+2. 启动： sudo /etc/init.d/clickhouse-server start
+3. 
