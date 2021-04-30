@@ -67,5 +67,5 @@ clickhouse 文档
 2. 启动： sudo /etc/init.d/clickhouse-server start
 
 ### TODO
-1. 论文去重 + 排版
+1. 论文去重 + 排版 + 添加参考文献
 2. easyV
