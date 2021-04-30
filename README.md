@@ -65,4 +65,7 @@ clickhouse 文档
 #### clickhouse
 1. config: sudo vi /etc/clickhouse-server/config.xml
 2. 启动： sudo /etc/init.d/clickhouse-server start
-3. 
+
+### TODO
+1. 论文去重 + 排版
+2. easyV
