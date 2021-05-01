@@ -31,7 +31,7 @@ public class KafkaToFlink {
           Thread.sleep(ThreadLocalRandom.current().nextInt(0, 10));
           return s;
         });
-    dataStreamSource.addSink(new FlinkToCK("10.227.89.202", 8123 + "", "default", "1234"));
+    dataStreamSource.addSink(new FlinkToCK("82.157.179.4", 8123 + "", "default", "123"));
     streamExecutionEnvironment.execute("flink consume kafka topic");
   }
 }

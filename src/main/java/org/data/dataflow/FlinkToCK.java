@@ -24,7 +24,7 @@ class FlinkToCK extends RichSinkFunction<String> {
   @Override
   public void invoke(String value, Context context) throws SQLException {
     // ods table
-    String ods_subway_data_sql = "INSERT INTO ods_subway_data (deal_date, close_date, card_no, deal_value, deal_type, company_name, car_no, station, conn_mark, deal_money, equ_no) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    String ods_subway_data_sql = "INSERT INTO sz_subway.ods_subway_data (deal_date, close_date, card_no, deal_value, deal_type, company_name, car_no, station, conn_mark, deal_money, equ_no) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     PreparedStatement statement = connection_.prepareStatement(ods_subway_data_sql);
     Map<String, String> mapVal = new Gson().fromJson(
         value, new TypeToken<HashMap<String, String>>() {
@@ -46,7 +46,7 @@ class FlinkToCK extends RichSinkFunction<String> {
 
     // dwd table (对不合理的数据进行过滤)
     String dwd_subway_data_sql =
-        "INSERT INTO dwd_subway_data (deal_date, close_date, card_no, deal_value, deal_type, company_name, car_no, station, conn_mark, deal_money, equ_no) SELECT "
+        "INSERT INTO sz_subway.dwd_subway_data (deal_date, close_date, card_no, deal_value, deal_type, company_name, car_no, station, conn_mark, deal_money, equ_no) SELECT "
             + "deal_date,"
             + "close_date,"
             + "card_no,"
@@ -58,14 +58,14 @@ class FlinkToCK extends RichSinkFunction<String> {
             + "conn_mark,"
             + "deal_money,"
             + "equ_no "
-            + "FROM ods_subway_data "
+            + "FROM sz_subway.ods_subway_data "
             + "WHERE deal_type != '巴士'";
     statement = connection_.prepareStatement(dwd_subway_data_sql);
     statement.execute();
 
     // dwd in station table
     String dwd_in_station_data_sql =
-        "INSERT INTO dwd_in_station_data (deal_date, card_no, deal_type, company_name, car_no, station, equ_no) SELECT "
+        "INSERT INTO sz_subway.dwd_in_station_data (deal_date, card_no, deal_type, company_name, car_no, station, equ_no) SELECT "
             + "deal_date,"
             + "card_no,"
             + "deal_type,"
@@ -73,13 +73,13 @@ class FlinkToCK extends RichSinkFunction<String> {
             + "car_no,"
             + "station,"
             + "equ_no "
-            + "FROM dwd_subway_data "
+            + "FROM sz_subway.dwd_subway_data "
             + "WHERE deal_type == '地铁入站'";
     statement = connection_.prepareStatement(dwd_in_station_data_sql);
     statement.execute();
     // dwd out station table
     String dwd_out_station_data_sql =
-        "INSERT INTO dwd_out_station_data (deal_date, close_date, card_no, deal_value, deal_type, company_name, car_no, station, conn_mark, deal_money, equ_no) SELECT "
+        "INSERT INTO sz_subway.dwd_out_station_data (deal_date, close_date, card_no, deal_value, deal_type, company_name, car_no, station, conn_mark, deal_money, equ_no) SELECT "
             + "deal_date,"
             + "close_date,"
             + "card_no,"
@@ -91,14 +91,14 @@ class FlinkToCK extends RichSinkFunction<String> {
             + "conn_mark,"
             + "deal_money,"
             + "equ_no "
-            + "FROM dwd_subway_data "
+            + "FROM sz_subway.dwd_subway_data "
             + "WHERE deal_type == '地铁出站'";
     statement = connection_.prepareStatement(dwd_out_station_data_sql);
     statement.execute();
 
     // dwd in station rank
-    connection_.createStatement().execute("DROP TABLE IF EXISTS  dwd_in_station_rank");
-    connection_.createStatement().execute("CREATE TABLE  IF NOT EXISTS dwd_in_station_rank (" +
+    connection_.createStatement().execute("DROP TABLE IF EXISTS  sz_subway.dwd_in_station_rank");
+    connection_.createStatement().execute("CREATE TABLE  IF NOT EXISTS sz_subway.dwd_in_station_rank (" +
         "station Nullable(String),"
         + "deal_dates Array(String),"
         + "card_nos Array(String),"
@@ -108,22 +108,22 @@ class FlinkToCK extends RichSinkFunction<String> {
         + ") ENGINE  = MergeTree() order by nums"
     );
     String dwd_in_station_rank_sql =
-        "INSERT INTO dwd_in_station_rank (station, deal_dates, card_nos, company_names, equ_nos, nums) SELECT "
+        "INSERT INTO sz_subway.dwd_in_station_rank (station, deal_dates, card_nos, company_names, equ_nos, nums) SELECT "
             + "station,"
             + "groupArray(deal_date),"
             + "groupArray(card_no),"
             + "groupArray(company_name),"
             + "groupArray(equ_no),"
             + "count(*) nums "
-            + "FROM dwd_in_station_data "
+            + "FROM sz_subway.dwd_in_station_data "
             + "GROUP BY station "
             + "ORDER BY nums DESC";
     statement = connection_.prepareStatement(dwd_in_station_rank_sql);
     statement.execute();
 
     // dwd out station rank
-    connection_.createStatement().execute("DROP TABLE IF EXISTS  dwd_out_station_rank");
-    connection_.createStatement().execute("CREATE TABLE  IF NOT EXISTS dwd_out_station_rank (" +
+    connection_.createStatement().execute("DROP TABLE IF EXISTS  sz_subway.dwd_out_station_rank");
+    connection_.createStatement().execute("CREATE TABLE  IF NOT EXISTS sz_subway.dwd_out_station_rank (" +
         "station Nullable(String),"
         + "deal_dates Array(String),"
         + "card_nos Array(String),"
@@ -136,7 +136,7 @@ class FlinkToCK extends RichSinkFunction<String> {
         + ") ENGINE  = MergeTree() ORDER BY nums"
     );
     String dwd_out_station_rank_sql =
-        "INSERT INTO dwd_out_station_rank (station, deal_dates, card_nos, deal_values, company_names, conn_marks, deal_moneys, equ_nos, nums) SELECT "
+        "INSERT INTO sz_subway.dwd_out_station_rank (station, deal_dates, card_nos, deal_values, company_names, conn_marks, deal_moneys, equ_nos, nums) SELECT "
             + "station,"
             + "groupArray(deal_date),"
             + "groupArray(card_no),"
@@ -146,15 +146,15 @@ class FlinkToCK extends RichSinkFunction<String> {
             + "groupArray(deal_money),"
             + "groupArray(equ_no),"
             + "count(*) nums "
-            + "FROM dwd_out_station_data "
+            + "FROM sz_subway.dwd_out_station_data "
             + "GROUP BY station "
             + "ORDER BY nums DESC";
     statement = connection_.prepareStatement(dwd_out_station_rank_sql);
     statement.execute();
 
     // dwd in and out station rank
-    connection_.createStatement().execute("DROP TABLE IF EXISTS  dwd_in_out_station_rank");
-    connection_.createStatement().execute("CREATE TABLE  IF NOT EXISTS dwd_in_out_station_rank (" +
+    connection_.createStatement().execute("DROP TABLE IF EXISTS  sz_subway.dwd_in_out_station_rank");
+    connection_.createStatement().execute("CREATE TABLE  IF NOT EXISTS sz_subway.dwd_in_out_station_rank (" +
         "station Nullable(String),"
         + "deal_dates Array(String),"
         + "card_nos Array(String),"
@@ -168,7 +168,7 @@ class FlinkToCK extends RichSinkFunction<String> {
         + ") ENGINE  = MergeTree() ORDER BY nums"
     );
     String dwd_in_out_station_rank_sql =
-        "INSERT INTO dwd_in_out_station_rank (station, deal_dates, card_nos, deal_values, deal_types, company_names, conn_marks, deal_moneys, equ_nos, nums) SELECT "
+        "INSERT INTO sz_subway.dwd_in_out_station_rank (station, deal_dates, card_nos, deal_values, deal_types, company_names, conn_marks, deal_moneys, equ_nos, nums) SELECT "
             + "station,"
             + "groupArray(deal_date),"
             + "groupArray(card_no),"
@@ -179,15 +179,15 @@ class FlinkToCK extends RichSinkFunction<String> {
             + "groupArray(deal_money),"
             + "groupArray(equ_no),"
             + "count(*) nums "
-            + "FROM dwd_subway_data "
+            + "FROM sz_subway.dwd_subway_data "
             + "GROUP BY station "
             + "ORDER BY nums DESC";
     statement = connection_.prepareStatement(dwd_in_out_station_rank_sql);
     statement.execute();
 
     // stations 盈利排行榜
-    connection_.createStatement().execute("DROP TABLE IF EXISTS  dwd_station_earning_rank");
-    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS dwd_station_earning_rank (" +
+    connection_.createStatement().execute("DROP TABLE IF EXISTS  sz_subway.dwd_station_earning_rank");
+    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS sz_subway.dwd_station_earning_rank (" +
         "station String,"
         + "company_name String,"
         + "deal_value_sum Float64,"
@@ -195,12 +195,12 @@ class FlinkToCK extends RichSinkFunction<String> {
         + ") ENGINE  = TinyLog()"
     );
     String dwd_station_earning_rank_sql =
-        "INSERT INTO dwd_station_earning_rank (station, company_name, deal_value_sum, deal_money_sum) SELECT "
+        "INSERT INTO sz_subway.dwd_station_earning_rank (station, company_name, deal_value_sum, deal_money_sum) SELECT "
         + "station,"
         + "company_name,"
         + "sum(toFloat64OrZero(deal_value))/100 AS deal_value_sum,"
         + "sum(toFloat64OrZero(deal_money))/100 AS deal_money_sum "
-        + "FROM dwd_out_station_data "
+        + "FROM sz_subway.dwd_out_station_data "
         + "GROUP BY company_name, station "
         + "ORDER BY deal_value_sum desc";
     statement = connection_.prepareStatement(dwd_station_earning_rank_sql);
@@ -215,9 +215,10 @@ class FlinkToCK extends RichSinkFunction<String> {
   public void open(Configuration param) throws SQLException {
     this.connection_ = DriverManager
         .getConnection("jdbc:clickhouse://" + host_ + ":" + port_, user_, pwd_);
+    this.connection_.createStatement().execute("CREATE DATABASE IF NOT EXISTS sz_subway");
     // ods table
-    this.connection_.createStatement().execute("DROP TABLE IF EXISTS ods_subway_data");
-    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS ods_subway_data (" +
+    this.connection_.createStatement().execute("DROP TABLE IF EXISTS sz_subway.ods_subway_data");
+    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS sz_subway.ods_subway_data (" +
         "deal_date String,"
         + "close_date Nullable(String),"
         + "card_no Nullable(String),"
@@ -232,8 +233,8 @@ class FlinkToCK extends RichSinkFunction<String> {
         + ") ENGINE = MergeTree() ORDER BY deal_date"
     );
     // dwd table (对不合理的数据进行过滤)
-    this.connection_.createStatement().execute("DROP TABLE IF EXISTS dwd_subway_data");
-    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS dwd_subway_data (" +
+    this.connection_.createStatement().execute("DROP TABLE IF EXISTS sz_subway.dwd_subway_data");
+    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS sz_subway.dwd_subway_data (" +
         "deal_date String,"
         + "close_date Nullable(String),"
         + "card_no Nullable(String),"
@@ -248,8 +249,8 @@ class FlinkToCK extends RichSinkFunction<String> {
         + ") ENGINE = MergeTree() ORDER BY deal_date"
     );
     // dwd in station table
-    this.connection_.createStatement().execute("DROP TABLE IF EXISTS dwd_in_station_data");
-    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS dwd_in_station_data (" +
+    this.connection_.createStatement().execute("DROP TABLE IF EXISTS sz_subway.dwd_in_station_data");
+    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS sz_subway.dwd_in_station_data (" +
         "deal_date String,"
         + "card_no Nullable(String),"
         + "deal_type Nullable(String),"
@@ -260,8 +261,8 @@ class FlinkToCK extends RichSinkFunction<String> {
         + ") ENGINE = MergeTree() ORDER BY  deal_date"
     );
     // dwd out station table
-    this.connection_.createStatement().execute("DROP TABLE IF EXISTS dwd_out_station_data");
-    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS dwd_out_station_data (" +
+    this.connection_.createStatement().execute("DROP TABLE IF EXISTS sz_subway.dwd_out_station_data");
+    connection_.createStatement().execute("CREATE TABLE IF NOT EXISTS sz_subway.dwd_out_station_data (" +
         "deal_date String,"
         + "close_date Nullable(String),"
         + "card_no Nullable(String),"
