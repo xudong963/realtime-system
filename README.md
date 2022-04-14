@@ -48,7 +48,7 @@
 4. kafka server.properties 中需要关注 **broker.id**, **listeners**, **log.dirs**, **zookeeper.connect**
 5. 启动 kafka: kafka-server-start.sh ../config/server.properties&   & 代表 kafka 后台进行
 6. jps 可以查看kafka 进程是否启动
-7. kafka-eagle 启动后 可以进行登陆，账号和密码分别是： admin 123456..
+7. kafka-eagle 启动后 可以进行登陆，账号和密码分别是： 
 8. 清空kafka topic: kafka-configs.sh --zookeeper localhost:2181 --entity-type topics --alter --entity-name my-topic --add-config retention.ms=1000
 9. 上面的清空操作是通过修改 retention 时间实现的，现在需要重新修改回来 retention: ./kafka-topics.sh --zookeeper localhost:2181 --alter --topic my-topic --delete-config retention.ms
 10. 查看 retention 时间是多少：  grep -i 'log.retention.[hms].*\=' config/server.properties
@@ -64,4 +64,3 @@
 启动程序后，即可登陆
 https://easyv.dtstack.com/workspace/shareScreen/eyJzY3JlZW5JZCI6MjAyMjA3fQ==
 
-密码：123456
