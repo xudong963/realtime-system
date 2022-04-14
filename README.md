@@ -60,7 +60,7 @@ clickhouse 文档
 
 #### 腾讯云
 1. ssh root@82.157.179.4
-2. 密码： zsy123456..
+2. 密码： 
 
 #### clickhouse
 1. config: sudo vi /etc/clickhouse-server/config.xml
